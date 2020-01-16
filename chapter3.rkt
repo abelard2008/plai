@@ -22,6 +22,11 @@
                       (subst named-expr sub-id val)
                       (subst bound-body sub-id val)))]
       [id (v) (if (symbol=? v sub-id) val expr)]))
+
+(test (subst (id 'x) 'x (num 5)) (num 5))
+(test (subst (add (id 'x) (num 5))
+             'x
+             (num 5)) (add (num 5) (num 5))) 
 ;; (subst (add (id 'x) (id 'x))   'x (num 5))
 ;; (subst (num 5) 'x 5)
 ;; (+ 4 4)
@@ -43,7 +48,7 @@
                        (parse (second (second sexp)))
                        (parse (third sexp)))]
          )])))
-(parse '(+ x x))
+;; (parse '(+ x x))
 (define (calc expr)
     (type-case WAE expr
       [num (n) n]
@@ -57,7 +62,11 @@
 
 
 (parse '{with {x 5} {+ x 5}})
+(test (parse (second (second '{with {x 5} {+ x 5}}))) (num 5))
+(test (first (second '{with {x 5} {+ x 5}})) 'x)
+(test (parse (third '{with {x 5} {+ x 5}})) (add (id 'x) (num 5)))
 (calc (with 'x (num 5) (add (id 'x) (num 5))))
+
 (calc (subst (add (id 'x) (num 5))
              'x
              (num (calc (num 5)))))
